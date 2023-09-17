@@ -1,0 +1,22 @@
+ale-py==0.8.1
+AutoROM==0.6.1
+certifi==2023.7.22
+charset-normalizer==3.2.0
+click==8.1.7
+cloudpickle==2.2.1
+Farama-Notifications==0.0.4
+gymnasium==0.29.1
+idna==3.4
+importlib-resources==6.0.1
+numpy @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_a19y8c22jc/croot/numpy_and_numpy_base_1691091616945/work
+pynput==1.7.6
+pyobjc-core==9.2
+pyobjc-framework-ApplicationServices==9.2
+pyobjc-framework-Cocoa==9.2
+pyobjc-framework-Quartz==9.2
+requests==2.31.0
+scipy @ file:///private/var/folders/nz/j6p8yfhx1mv_0grj5xl4650h0000gp/T/abs_66h0hq6x34/croot/scipy_1691606685645/work/dist/scipy-1.11.1-cp311-cp311-macosx_11_0_arm64.whl#sha256=71799faffb4c30e05c1b325dec4d248cd6284bac1b90cb105990f1115c38b4ce
+Shimmy==0.2.1
+six==1.16.0
+typing_extensions==4.7.1
+urllib3==2.0.4
