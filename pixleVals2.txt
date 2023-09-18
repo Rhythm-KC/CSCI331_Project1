@@ -1,0 +1,11 @@
+Row: 34, Col: 77
+
+Row: 62, Col: 65, Row: 62, Col: 93
+
+Row: 91, Col: 53, Row: 91, Col: 77, Row: 91, Col: 105
+
+Row: 120, Col: 41,Row: 120, Col: 65,Row: 120, Col: 93,Row: 120, Col: 117
+
+Row: 149, Col: 29,Row: 149, Col: 53,Row: 149, Col: 77,Row: 149, Col: 105,Row: 149, Col: 129
+
+Row: 178, Col: 17,Row: 178, Col: 41,Row: 178, Col: 65,Row: 178, Col: 93,Row: 178, Col: 117,Row: 178, Col: 141
