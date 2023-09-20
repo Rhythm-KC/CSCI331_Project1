@@ -3,6 +3,13 @@ import sys
 import pdb
 import gymnasium as gym
 from gymnasium import wrappers, logger
+import enviorment
+
+
+
+
+
+qbertPostion = [1,6]
 
 
 class Agent(object):
@@ -13,22 +20,29 @@ class Agent(object):
 
     # You should modify this function
     def act(self, observation, reward, done):
+        if(len(observation)==2):
+            return 
+        for tiles in enviorment.enviorment:
+            for tile in tiles:
+                enviorment.updateTile(tile, observation, [255,255,255]) 
+        if(enviorment.enviorment[qbertPostion[0]-1][qbertPostion[1]!=None]enviorment.enviorment[qbertPostion[0]-1][qbertPostion[1].character!=enviorment.Character.Springy]):
+            
         return self.action_space.sample()
 
 # YOU MAY NOT MODIFY ANYTHING BELOW THIS LINE OR USE
 # ANOTHER MAIN PROGRAM
 
 
-def isqberthere(coordinate, frame):
+# def isqberthere(coordinate, frame):
 
-    qbert_color = [181, 83, 40]
-    coordinate[0] -= 7  # 4 is the height
-    list_of_coordinates = [[coordinate], [coordinate[0], coordinate[1] + 1], [coordinate[0], coordinate[1] - 1]]
-    for x, y in list_of_coordinates:
-        if (frame[x][y] == qbert_color).all():
-            print(f"found qbert at {coordinate[0], coordinate[1]}")
-            return True
-    return False
+#     qbert_color = [181, 83, 40]
+#     coordinate[0] -= 7  # 4 is the height
+#     list_of_coordinates = [[coordinate], [coordinate[0], coordinate[1] + 1], [coordinate[0], coordinate[1] - 1]]
+#     for x, y in list_of_coordinates:
+#         if (frame[x][y] == qbert_color).all():
+#             print(f"found qbert at {coordinate[0], coordinate[1]}")
+#             return True
+#     return False
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=None)
@@ -63,7 +77,6 @@ if __name__ == '__main__':
         action = agent.act(observation, reward, terminated)
         # pdb.set_trace()
         observation, reward, terminated, truncated, info = env.step(action)
-        isqberthere([34, 77], observation)
         score += reward
         frame = env.render()
 
