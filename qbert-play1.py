@@ -19,6 +19,17 @@ class Agent(object):
 # ANOTHER MAIN PROGRAM
 
 
+def isqberthere(coordinate, frame):
+
+    qbert_color = [181, 83, 40]
+    coordinate[0] -= 7  # 4 is the height
+    list_of_coordinates = [[coordinate], [coordinate[0], coordinate[1] + 1], [coordinate[0], coordinate[1] - 1]]
+    for x, y in list_of_coordinates:
+        if (frame[x][y] == qbert_color).all():
+            print(f"found qbert at {coordinate[0], coordinate[1]}")
+            return True
+    return False
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=None)
     parser.add_argument('--env_id', nargs='?', default='Qbert', help='Select the environment to run')
@@ -52,6 +63,7 @@ if __name__ == '__main__':
         action = agent.act(observation, reward, terminated)
         # pdb.set_trace()
         observation, reward, terminated, truncated, info = env.step(action)
+        isqberthere([34, 77], observation)
         score += reward
         frame = env.render()
 
