@@ -17,17 +17,12 @@ class Agent(object):
 
     def __init__(self, action_space):
         self.action_space = action_space
+        self.__environment = enviorment.GameState()
 
     # You should modify this function
     def act(self, observation, reward, done):
-        if(len(observation)==2):
-            return 
-        for tiles in enviorment.enviorment:
-            for tile in tiles:
-                enviorment.updateTile(tile, observation, [255,255,255]) 
-        if(enviorment.enviorment[qbertPostion[0]-1][qbertPostion[1]!=None]enviorment.enviorment[qbertPostion[0]-1][qbertPostion[1].character!=enviorment.Character.Springy]):
-            
-        return self.action_space.sample()
+        action = self.__environment.playgame(observation)
+        return action
 
 # YOU MAY NOT MODIFY ANYTHING BELOW THIS LINE OR USE
 # ANOTHER MAIN PROGRAM

@@ -6,6 +6,7 @@ import time
 from gymnasium import wrappers, logger
 from pynput import keyboard
 
+from PIL import Image
 
 """
 Action space
@@ -45,6 +46,16 @@ def on_release(key):
     action = 0
 
 
+def whereisqbert(coordinate, frame):
+    color = [181, 83, 40]
+    coordinate[0] -= 7  # 4 is the height
+    list_of_coordinates = [[coordinate], [coordinate[0], coordinate[1] + 1], [coordinate[0], coordinate[1] - 1]]     
+    for coordinates in list_of_coordinates:
+        x, y = coordinate
+        if (frame[x][y] == color).all():
+            print(f"found qbert at {coordinate[0], coordinate[1]}")
+            return True
+    return False
 # ...or, in a non-blocking fashion:
 listener = keyboard.Listener(
     on_press=on_press,
@@ -94,6 +105,7 @@ if __name__ == '__main__':
     observation = env.reset()
 
     terminated = False
+    i = 0
     while not terminated:
         
         action = agent.act(observation, reward, done)
@@ -101,6 +113,7 @@ if __name__ == '__main__':
 
         #pdb.set_trace()
         observation, reward, terminated, truncated, info = env.step(action)
+        whereisqbert([34, 77], observation)
         score += reward
 
         env.render()
