@@ -6,7 +6,6 @@ from env_info import available_moves
 from env_info import pos_to_moves
 
 import numpy as np
-import random
 
 
 class GameState:
@@ -14,14 +13,16 @@ class GameState:
     def __init__(self):
         self.qbert_color = [181, 83, 40]
         self.environment = np.array(Enviorment, dtype="object")
-        self.__baseColor = []
         self.__playablestate = False
         self.ready = False
         self.__baseColor = []
         self.__knowbaseColor = False
+        self.__totalreward = 0
+        self.__uncheckedbox = set()
 
     def __updateBaseColor(self, frame):
         x, y = self.environment[1][6].pxile
+        print(frame[x][y])
         self.__baseColor = frame[x][y]
         self.__knowbaseColor = True
         assert (len(self.__baseColor) == 3)
@@ -36,14 +37,17 @@ class GameState:
                     self.ready = True
                     return
 
-    def __updateTile(self, tile: Tile, frame):
+    def __updateTile(self, tile: Tile, frame, tilePos):
 
         if not tile:
             return
-        if (frame[tile.pxile[0]][tile.pxile[1]] == self.__baseColor).all():
+        if (frame[tile.pxile[0] + 2][tile.pxile[1]] == self.__baseColor).all():
             tile.state = 0
+            self.__uncheckedbox.add(tilePos)
         else:
             tile.state = 1
+            if tilePos in self.__uncheckedbox:
+                self.__uncheckedbox.remove(tilePos)
 
         qbert_color = [181, 83, 40]
         springy_color = [146, 70, 192]
@@ -56,7 +60,12 @@ class GameState:
             if (frame[row][col] == qbert_color).all():
                 tile.character = Character.QBERT
                 return
-            if (frame[row+2][col] == springy_color).all():
+            if ((frame[row+2][col] == springy_color).all()
+                    or (frame[row + 3][col] == springy_color).all()
+                    or (frame[row + 4][col] == springy_color).all()
+                    or (frame[row - 1][col] == springy_color).all()
+                    or (frame[row - 2][col] == springy_color).all()
+                    or (frame[row - 3][col] == springy_color).all()):
                 tile.character = Character.SPRINGY
                 return
             if (frame[row][col] == greenGuy_color).all():
@@ -67,6 +76,7 @@ class GameState:
     def update_tiles(self, frame):
 
         if not self.__knowbaseColor:
+            print("base color change")
             self.__updateBaseColor(frame)
 
         if not self.ready:
@@ -75,7 +85,7 @@ class GameState:
         if self.ready:
             for i in range(len(self.environment)):
                 for j in range(len(self.environment[0])):
-                    self.__updateTile(self.environment[i][j], frame)
+                    self.__updateTile(self.environment[i][j], frame, (i, j))
 
     def __getCharacter(self, character):
         for i in range(len(self.environment)):
@@ -112,6 +122,60 @@ class GameState:
                 return False
         return True
 
+    def __finddistance(self, qbertspos, set_of_other_points):
+        points = set()
+        for point in set_of_other_points:
+            dis = np.linalg.norm(np.array(list(qbertspos)) - np.array(list(point)))
+            points.add((point, dis))
+        return points
+
+    def __getNudges(self, qbertposition, boxtogo):
+        bestposition = set()
+        q_x, q_y = qbertposition
+        x, y = boxtogo
+
+        val = 0
+        if x > q_x and y < q_y:
+            val = 1
+            dx, dy = moves_to_position[5]
+            bestposition.add((q_x + dx, q_y + dy))
+        if x > q_x and y >= q_y:
+            val = 2
+            dx, dy = moves_to_position[3]
+            bestposition.add((q_x + dx, q_y + dy))
+        if x < q_x and y > q_y:
+            val = 3
+            dx, dy = moves_to_position[2]
+            bestposition.add((q_x + dx, q_y + dy))
+        if x < q_x and y <= q_y:
+            val = 4
+            dx, dy = moves_to_position[4]
+            bestposition.add((q_x + dx, q_y + dy))
+        if x == q_x and q_y < y:
+            val = 5
+            dx, dy = moves_to_position[2]
+            bestposition.add((q_x + dx, q_y + dy))
+            dx, dy = moves_to_position[3]
+            bestposition.add((q_x + dx, q_y + dy))
+        if x == q_x and q_y > y:
+            val = 6
+            dx, dy = moves_to_position[4]
+            bestposition.add((q_x + dx, q_y + dy))
+            dx, dy = moves_to_position[5]
+            bestposition.add((q_x + dx, q_y + dy))
+        return bestposition
+
+    def __nudgeqbert(self, qbertspostion):
+        distances = self.__finddistance(qbertspostion, self.__uncheckedbox)
+        sorted_distance = sorted(distances, key=lambda x: x[1])
+        bestposition = set()
+        if len(sorted_distance) == 0:
+            return bestposition
+        for distance in sorted_distance:
+            for val in self.__getNudges(qbertspostion, distance[0]):
+                bestposition.add(val)
+        return bestposition
+
     def __getnextmove(self):
 
         qbert_pos = self.__getCharacter(Character.QBERT)
@@ -124,22 +188,32 @@ class GameState:
             qbert_moves = available_moves[qbert_pos]
             qberts_possible_position = self.__findnextpostion(qbert_pos, qbert_moves)
         if springy_pos:
+            springy_moves = available_moves[springy_pos]
             springy_possible_position = self.__findnextpostion(springy_pos, springy_moves)
             springy_possible_position.add(tuple(springy_pos))
 
-        safe_moves = list(qberts_possible_position.difference(springy_possible_position))
+        safe_moves = qberts_possible_position
+        if self.__isAllColorNotBase(qberts_possible_position) and qbert_pos:
+            boxes_nudge = self.__nudgeqbert(qbert_pos)
+            valid_nudges = boxes_nudge.intersection(safe_moves)
+            safe_moves = list(valid_nudges) + list(safe_moves)
+
+        safe_moves = list(set(safe_moves).difference(springy_possible_position))
+        safe_moves = sorted(qberts_possible_position, key=lambda x: self.environment[x[0]][x[1]].state)
+
         if not safe_moves:
             return 0
-        safe_moves = sorted(safe_moves, key=lambda x: self.environment[x[0]][x[1]].state)
-        move_selector = 0
-        if self.__isAllColorNotBase(safe_moves):
-            move_selector = random.randint(0, len(safe_moves)-1)
 
-        action = self.__position_to_move(qbert_pos, safe_moves[move_selector])
+        action = self.__position_to_move(qbert_pos, safe_moves[0])
         return action
 
-    def playgame(self, frame):
-        self.update_tiles(frame)
+    def playgame(self, frame, reward):
+        if reward == 100:
+            print(reward)
+            self.ready = False
+            self.__knowbaseColor = False
+        else:
+            self.update_tiles(frame)
         if self.ready:
             return self.__getnextmove()
         else:

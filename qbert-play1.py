@@ -21,7 +21,7 @@ class Agent(object):
 
     # You should modify this function
     def act(self, observation, reward, done):
-        action = self.__environment.playgame(observation)
+        action = self.__environment.playgame(observation, reward)
         return action
 
 # YOU MAY NOT MODIFY ANYTHING BELOW THIS LINE OR USE
@@ -66,11 +66,15 @@ if __name__ == '__main__':
     special_data = {}
     special_data['ale.lives'] = 3
     observation = env.reset()[0]
+    frame_count = 0
 
     while not terminated:
         env.render()
         action = agent.act(observation, reward, terminated)
         # pdb.set_trace()
+        if frame_count == 0:
+            frame_count += 1
+            continue
         observation, reward, terminated, truncated, info = env.step(action)
         score += reward
         frame = env.render()

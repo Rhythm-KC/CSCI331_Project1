@@ -7,6 +7,18 @@ class Tile:
         self.pxile = pixle
         self.character = character
 
+    def __str__(self):
+        return f"{self.pxile[0]}{self.pxile[1]}"
+
+    def __hash__(self):
+        return hash(str(self))
+
+    def __eq__(self, o):
+        return (isinstance(o, Tile) and
+                self.state == o.state
+                and self.pxile == o.pxile
+                and self.character == o.character)
+
 
 class Character(Enum):
     QBERT = 1
@@ -63,7 +75,7 @@ Enviorment = [
                 [None, None, None, None, None, Tile(0, [62, 65], Character.EMPTY), Tile(0, [62, 93], Character.EMPTY), None],
                 [None, None, None, None, Tile(0, [91, 53], Character.EMPTY), Tile(0, [91, 77], Character.EMPTY), Tile(0, [91, 105], Character.EMPTY), None],
                 [None, None, None, Tile(0, [120, 41], Character.EMPTY), Tile(0, [120, 65], Character.EMPTY), Tile(0, [120, 93], Character.EMPTY), Tile(0, [120, 117], Character.EMPTY), None],
-                [None, None, Tile(0, [149, 29], Character.EMPTY), Tile(0, [149, 53], Character.EMPTY), Tile(0, [149, 77], Character.EMPTY), Tile(0, [149, 105], Character.EMPTY), Tile(0, [139, 129], Character.EMPTY), None],
+                [None, None, Tile(0, [149, 29], Character.EMPTY), Tile(0, [149, 53], Character.EMPTY), Tile(0, [149, 77], Character.EMPTY), Tile(0, [149, 105], Character.EMPTY), Tile(0, [149, 129], Character.EMPTY), None],
                 [None, Tile(0, [178, 17], Character.EMPTY), Tile(0, [178, 41], Character.EMPTY), Tile(0, [178, 65], Character.EMPTY), Tile(0, [178, 93], Character.EMPTY), Tile(0, [178, 117], Character.EMPTY), Tile(0, [178, 141], Character.EMPTY), None],
                 [None, None, None, None, None, None, None, None],
                 ]
