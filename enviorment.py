@@ -23,7 +23,6 @@ class GameState:
 
     def __updateBaseColor(self, frame):
         x, y = self.environment[5][5].pxile
-        print(frame[x][y])
         self.__baseColor = frame[x][y]
         self.__knowbaseColor = True
         assert (len(self.__baseColor) == 3)
@@ -77,7 +76,6 @@ class GameState:
     def update_tiles(self, frame):
 
         if not self.__knowbaseColor:
-            print("base color change")
             self.__updateBaseColor(frame)
 
         if not self.ready:
@@ -216,7 +214,6 @@ class GameState:
     def playgame(self, frame, reward):
         if reward == 100:
             self._counter=5
-            print(reward)
             self.ready = False
         if self._counter != 0:
             self._counter -= 1
