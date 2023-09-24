@@ -19,9 +19,10 @@ class GameState:
         self.__knowbaseColor = False
         self.__totalreward = 0
         self.__uncheckedbox = set()
+        self._counter=0
 
     def __updateBaseColor(self, frame):
-        x, y = self.environment[1][6].pxile
+        x, y = self.environment[5][5].pxile
         print(frame[x][y])
         self.__baseColor = frame[x][y]
         self.__knowbaseColor = True
@@ -196,10 +197,15 @@ class GameState:
         if self.__isAllColorNotBase(qberts_possible_position) and qbert_pos:
             boxes_nudge = self.__nudgeqbert(qbert_pos)
             valid_nudges = boxes_nudge.intersection(safe_moves)
-            safe_moves = list(valid_nudges) + list(safe_moves)
-
+            valid_nudges = list(set(valid_nudges).difference(springy_possible_position))
+            if len(valid_nudges) != 0:
+                action = self.__position_to_move(qbert_pos, valid_nudges[0])
+                return action
+        
+        
+        
         safe_moves = list(set(safe_moves).difference(springy_possible_position))
-        safe_moves = sorted(qberts_possible_position, key=lambda x: self.environment[x[0]][x[1]].state)
+        safe_moves = sorted(safe_moves, key=lambda x: self.environment[x[0]][x[1]].state)
 
         if not safe_moves:
             return 0
@@ -209,12 +215,17 @@ class GameState:
 
     def playgame(self, frame, reward):
         if reward == 100:
+            self._counter=5
             print(reward)
             self.ready = False
+        if self._counter != 0:
+            self._counter -= 1
             self.__knowbaseColor = False
+
         else:
             self.update_tiles(frame)
         if self.ready:
-            return self.__getnextmove()
+            toReturn = self.__getnextmove()
+            return toReturn
         else:
             return 0
